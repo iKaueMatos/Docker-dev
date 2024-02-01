@@ -1,71 +1,91 @@
 version: "3.6"
 
 services:
-    rabbitmq:
-        image: rabbitmq:3.8-management
-        container_name: rabbitmq
-        restart: always
-        ports:
-            - "5672:5672"
-            - "15672:15672"
-        volumes:
-            - ./data:/var/lib/rabbitmq/
-        environment:
-            - RABBITMQ_DEFAULT_USER=nova
-            - RABBITMQ_DEFAULT_PASS=nova
-    
-    redis:
-        image: redis:3.2.5-alpine
-        container_name: redis
-        ports:
-            - "6379:6379"
-        volumes:
-            - ./redis_data:/data
-    
-    database:
-        image: mysql:latest
-        container_name: mysql_database
-        environment:
-            - MYSQL_ROOT_USER=root
-            - MYSQL_ROOT_PASSWORD=Nova
-            - MYSQL_DATABASE=novasoftware
-        ports:
-            - "3306:3306"
+  web:
+    build:
+      context: .
+      dockerfile: ./.docker/DockerFile
+    container_name: dashboard-nova
+    ports:
+      - "3001:80"
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    restart: on-failure
+    ports:
+      - "9001:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${VOLUMES_DIR}/portainer:/data
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./data:/var/lib/rabbitmq/
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
 
-    sonarqube:
-        image: sonarqube:community
-        hostname: sonarqube
-        container_name: sonarqube
-        depends_on:
-            - sonarqube-db
-        environment:
-            SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
-            SONAR_JDBC_USERNAME: sonar
-            SONAR_JDBC_PASSWORD: sonar
-        volumes:
-            - sonarqube_data:/opt/sonarqube/data
-            - sonarqube_extensions:/opt/sonarqube/extensions
-            - sonarqube_logs:/opt/sonarqube/logs
-        ports:
-            - "9000:9000"
+  redis:
+    image: redis:3.2.5-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
 
-    sonarqube-db:
-       image: postgres:13
-       hostname: postgresql
-       container_name: postgresql
-       environment:
-          POSTGRES_USER: sonar
-          POSTGRES_PASSWORD: sonar
-          POSTGRES_DB: sonar
-       volumes:
-            - postgresql:/var/lib/postgresql
-            - postgresql_data:/var/lib/postgresql/data
+  database:
+    image: mysql:latest
+    container_name: database
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=Nova
+      - MYSQL_DATABASE=novasoftware
+    ports:
+      - "3308:3306"
+
+  sonarqube:
+    image: sonarqube:community
+    hostname: sonarqube
+    container_name: sonarqube
+    depends_on:
+      - sonarqube-db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+
+  sonarqube-db:
+    image: postgres:13
+    hostname: postgresql
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+    ports:
+      - "3307:3307"
 
 networks:
-    sonarqube-db:
+  sonarqube-db:
 volumes:
-    sonarqube_data:
-    sonarqube_extensions:
-    sonarqube_logs:
-    postgresql:
-    postgresql_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:

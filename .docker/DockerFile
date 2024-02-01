@@ -1,0 +1,20 @@
+FROM node:latest as builder
+
+WORKDIR /app
+
+COPY Nova-painel-v2/package.json ./
+RUN npm install
+
+COPY Nova-painel-v2/ ./
+RUN npm run build
+
+FROM nginx:latest
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=builder /app/dist .
+
+EXPOSE 80
+
+# Comando para iniciar o Nginx
+CMD ["nginx", "-g", "daemon off;"]
