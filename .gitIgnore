@@ -1,0 +1,4 @@
+./data
+./nginx
+./docker
+.docker-compose.yaml
