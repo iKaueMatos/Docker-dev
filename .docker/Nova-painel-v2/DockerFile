@@ -16,5 +16,4 @@ COPY --from=builder /app/dist .
 
 EXPOSE 80
 
-# Comando para iniciar o Nginx
 CMD ["nginx", "-g", "daemon off;"]

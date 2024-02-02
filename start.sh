@@ -69,17 +69,10 @@ wait_for_process() {
 }
 
 initialize_docker() {
-    if [ "$project_docker" == "docker-dev" ]; then
-        if [ -d "$project_docker" ]; then
-            echo "Iniciando Docker em $project_docker..."
-            (cd "$project_docker" && docker-compose up -d) || { echo "Erro ao iniciar Docker em $project_docker."; exit 1; }
-            wait_for_process "docker-compose" 6
-            echo "Docker em $project_docker iniciado."
-        else
-            echo "Erro: O diretório $project_docker não existe."
-            exit 1
-        fi
-    fi
+    echo "Iniciando Docker em $project_docker..."
+    (docker-compose up -d) || { echo "Erro ao iniciar Docker em $project_docker."; exit 1; }
+    wait_for_process "docker-compose" 6
+    echo "Docker em $project_docker iniciado."
 }
 
 initialize_services() {
