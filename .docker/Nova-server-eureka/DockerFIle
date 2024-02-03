@@ -1,0 +1,9 @@
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+COPY ../Nova-server-eureka/target/apibackend-0.0.1-SNAPSHOT.jar /app/apibackend-0.0.1-SNAPSHOT.jar
+
+EXPOSE 8087
+
+CMD ["java","-jar","/apibackend-0.0.1-SNAPSHOT.jar"]

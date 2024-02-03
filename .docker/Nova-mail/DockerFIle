@@ -1,0 +1,9 @@
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+COPY ../Nova-mail/target/apibackend-0.0.1-SNAPSHOT.jar /app/apibackend-0.0.1-SNAPSHOT.jar
+
+EXPOSE 8085
+
+CMD ["java","-Dspring.profiles.active=dev","-jar","/apibackend-0.0.1-SNAPSHOT.jar"]
